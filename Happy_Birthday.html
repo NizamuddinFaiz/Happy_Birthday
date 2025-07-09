@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, My Love!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #fce4ec, #f0f4f8); /* Soft pink and blue gradient */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            position: relative; /* For confetti and balloons */
+        }
+
+        /* Custom animation for text */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fade-in-scale {
+            animation: fadeInScale 1s ease-out forwards;
+        }
+
+        /* Custom animation for sections */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        /* Confetti styles */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ffcc00; /* Yellow */
+            opacity: 0;
+            border-radius: 50%;
+            animation: fall 3s ease-in forwards;
+        }
+
+        .confetti:nth-child(2n) { background-color: #ff66b2; /* Pink */ }
+        .confetti:nth-child(3n) { background-color: #66ccff; /* Blue */ }
+        .confetti:nth-child(4n) { background-color: #99ff99; /* Green */ }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotateZ(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0.5; }
+        }
+
+        /* Image carousel specific styles */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Max width for the carousel */
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 400px; /* Fixed height for consistency */
+            object-fit: cover; /* Cover the area, cropping if necessary */
+            display: none; /* Hidden by default */
+            border-radius: 1.5rem;
+        }
+
+        .carousel-image.active {
+            display: block;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #333;
+            border: none;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-radius: 9999px; /* Fully rounded */
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .carousel-button-prev {
+            left: 1rem;
+        }
+
+        .carousel-button-next {
+            right: 1rem;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .carousel-image {
+                height: 300px; /* Smaller height for mobile */
+            }
+            .carousel-button {
+                padding: 0.5rem 0.75rem;
+                font-size: 1.2rem;
+            }
+            .carousel-button-prev {
+                left: 0.5rem;
+            }
+            .carousel-button-next {
+                right: 0.5rem;
+            }
+        }
+
+        /* Button specific styles */
+        .surprise-button {
+            background-color: #ff66b2; /* Pink */
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px; /* Fully rounded */
+            font-size: 1.25rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.4); /* Soft pink shadow */
+            cursor: pointer;
+            border: none;
+            outline: none;
+            text-decoration: none; /* In case it's an anchor tag */
+            display: inline-block; /* To allow padding and margin */
+        }
+
+        .surprise-button:hover {
+            background-color: #e05c9f; /* Darker pink on hover */
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.6);
+        }
+
+        .surprise-button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(255, 102, 178, 0.3);
+        }
+
+        /* Surprise Section Styles */
+        .surprise-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* On top of everything */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .surprise-section.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: -50px; /* Start from below the screen */
+            width: 40px;
+            height: 50px;
+            background-color: #ffcc00; /* Yellow */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0;
+            animation: floatUp 5s ease-out forwards;
+            box-shadow: inset -5px -5px 5px rgba(0,0,0,0.2);
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 15px;
+            background-color: rgba(0,0,0,0.3);
+        }
+
+        /* Different balloon colors */
+        .balloon:nth-child(2n) { background-color: #ff66b2; /* Pink */ }
+        .balloon:nth-child(3n) { background-color: #66ccff; /* Blue */ }
+        .balloon:nth-child(4n) { background-color: #99ff99; /* Green */ }
+        .balloon:nth-child(5n) { background-color: #ff99e6; /* Light Purple */ }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        .cake-emoji {
+            font-size: 8rem; /* Large cake emoji */
+            animation: fadeInScale 1s ease-out forwards;
+            animation-delay: 0.5s;
+            transform: scale(0); /* Start scaled down */
+            opacity: 0;
+        }
+        .surprise-section.active .cake-emoji {
+            animation: fadeInScale 1s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <!-- Confetti Container -->
+    <div id="confetti-container" class="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden"></div>
+
+    <!-- Initial Birthday Message and Button Section -->
+    <div id="intro-section" class="max-w-4xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-12 text-center my-8 slide-in">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-pink-600 mb-4 fade-in-scale">
+            Happy Birthday, My Dearest Samreen Choudhary!
+        </h1>
+        <p class="text-lg md:text-xl text-gray-700 mb-8 fade-in-scale" style="animation-delay: 0.3s;">
+            On this special day, my heart overflows with joy and gratitude for having you in my life.
+            You bring so much light, laughter, and love into my world.
+            Every moment with you is a cherished memory.
+        </p>
+
+        <!-- New Surprise Button -->
+        <button id="surpriseButton" class="surprise-button mt-6 mb-8 fade-in-scale" style="animation-delay: 0.6s;">
+            Let's surprise!
+        </button>
+
+        <p class="text-2xl md:text-3xl font-semibold text-purple-600 fade-in-scale" style="animation-delay: 0.9s;">
+            With all my love,
+            Zubair
+        </p>
+    </div>
+
+    <!-- Surprise Section (Initially Hidden) -->
+    <div id="surprise-section" class="surprise-section hidden">
+        <div class="cake-emoji">🎂</div>
+    </div>
+
+    <!-- Image Carousel Section (Initially Hidden) -->
+    <div id="photo-section" class="max-w-4xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-12 text-center my-8 hidden">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-6">Our Beautiful Memories!</h2>
+        <div class="carousel-container mb-8">
+            <!-- IMPORTANT: Replace these image paths with the actual names of your image files -->
+            <img src="(1).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+1';" alt="Couple photo 1" class="carousel-image active">
+            <img src="(2).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+2';" alt="Couple photo 2" class="carousel-image">
+            <img src="(3).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+3';" alt="Couple photo 3" class="carousel-image">
+            <img src="(4).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+4';" alt="Couple photo 4" class="carousel-image">
+            <img src="(5).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+5';" alt="Couple photo 5" class="carousel-image">
+            <img src="(6).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+6';" alt="Couple photo 6" class="carousel-image">
+            <img src="(7).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+7';" alt="Couple photo 7" class="carousel-image">
+            <img src="(8).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+8';" alt="Couple photo 8" class="carousel-image">
+            <img src="(9).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+9';" alt="Couple photo 9" class="carousel-image">
+            <img src="(10).jpeg" onerror="this.onerror=null; this.src='https://placehold.co/600x400/cccccc/333333?text=Image+10';" alt="Couple photo 10" class="carousel-image">
+
+            <button class="carousel-button carousel-button-prev">&#10094;</button>
+            <button class="carousel-button carousel-button-next">&#10095;</button>
+        </div>
+        <p class="text-lg md:text-xl text-gray-700">Hope you enjoyed this little surprise! More memories to come.</p>
+    </div>
+
+    <footer class="text-gray-600 text-sm mt-8 pb-4">
+        &copy; 2025 Made with love.
+    </footer>
+
+    <script>
+        // Get references to the main sections
+        const introSection = document.getElementById('intro-section');
+        const surpriseSection = document.getElementById('surprise-section');
+        const photoSection = document.getElementById('photo-section');
+        const surpriseButton = document.getElementById('surpriseButton');
+        const cakeEmoji = document.querySelector('.cake-emoji');
+
+        // JavaScript for the image carousel
+        const images = document.querySelectorAll('.carousel-image');
+        const prevButton = document.querySelector('.carousel-button-prev');
+        const nextButton = document.querySelector('.carousel-button-next');
+        let currentImageIndex = 0;
+        let autoSlideInterval;
+
+        // Function to display a specific image in the carousel
+        function showImage(index) {
+            images.forEach(img => img.classList.remove('active')); // Hide all images
+            images[index].classList.add('active'); // Show the active image
+        }
+
+        // Function to show the next image in the carousel
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length; // Loop back to start if at end
+            showImage(currentImageIndex);
+            resetAutoSlide(); // Reset auto-slide timer on manual navigation
+        }
+
+        // Function to show the previous image in the carousel
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length; // Loop to end if at start
+            showImage(currentImageIndex);
+            resetAutoSlide(); // Reset auto-slide timer on manual navigation
+        }
+
+        // Event listeners for carousel navigation buttons
+        nextButton.addEventListener('click', nextImage);
+        prevButton.addEventListener('click', prevImage);
+
+        // Function to start automatic image sliding
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(nextImage, 5000); // Change image every 5 seconds
+        }
+
+        // Function to reset the automatic slide timer
+        function resetAutoSlide() {
+            clearInterval(autoSlideInterval); // Clear existing interval
+            startAutoSlide(); // Start a new interval
+        }
+
+        // Confetti animation
+        const confettiContainer = document.getElementById('confetti-container');
+
+        // Function to create a single confetti particle
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = Math.random() * 100 + 'vw'; // Random horizontal position
+            confetti.style.animationDuration = (Math.random() * 2 + 3) + 's'; // 3 to 5 seconds animation duration
+            confetti.style.animationDelay = Math.random() * 2 + 's'; // Random delay before animation starts
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 75%)`; // Random color - FIXED THIS LINE
+            confettiContainer.appendChild(confetti);
+
+            // Remove confetti particle after its animation ends to prevent DOM clutter
+            confetti.addEventListener('animationend', () => {
+                confetti.remove();
+            });
+        }
+
+        // Generate confetti continuously at an interval
+        setInterval(createConfetti, 200); // Create a new confetti particle every 200ms
+
+        // Surprise Button Logic
+        surpriseButton.addEventListener('click', function() {
+            // 1. Hide the intro section with a fade/slide out effect
+            introSection.classList.add('hidden'); // Use 'hidden' to remove it from flow
+
+            // 2. Show the surprise section
+            surpriseSection.classList.remove('hidden');
+            // Add 'active' class after a small delay to trigger CSS transitions
+            setTimeout(() => {
+                surpriseSection.classList.add('active');
+                // Trigger cake emoji animation by setting its initial transform/opacity
+                cakeEmoji.style.transform = 'scale(1)';
+                cakeEmoji.style.opacity = '1';
+            }, 10); // Small delay to allow display:block to apply before transition
+
+            // 3. Create and animate balloons
+            function createBalloons(count) {
+                for (let i = 0; i < count; i++) {
+                    const balloon = document.createElement('div');
+                    balloon.classList.add('balloon');
+                    balloon.style.left = Math.random() * 100 + 'vw'; // Random horizontal position
+                    balloon.style.animationDuration = (Math.random() * 3 + 4) + 's'; // 4 to 7 seconds animation duration
+                    balloon.style.animationDelay = Math.random() * 1 + 's'; // 0 to 1 second delay
+                    surpriseSection.appendChild(balloon);
+
+                    // Remove balloon after its animation ends
+                    balloon.addEventListener('animationend', () => {
+                        balloon.remove();
+                    });
+                }
+            }
+            createBalloons(30); // Generate 30 balloons for the surprise effect
+
+            // 4. After a delay, hide the surprise section and show the photo carousel
+            setTimeout(() => {
+                surpriseSection.classList.remove('active'); // Start fade out
+                // Fully hide after the transition completes (0.5s from CSS)
+                setTimeout(() => {
+                    surpriseSection.classList.add('hidden');
+                }, 500);
+
+                photoSection.classList.remove('hidden'); // Show the photo section
+                photoSection.classList.add('slide-in'); // Add slide-in animation to photo section
+                showImage(0); // Ensure the first image of the carousel is shown
+                startAutoSlide(); // Start the automatic photo carousel slide
+            }, 4000); // Wait for 4 seconds (adjust this duration based on how long you want the cake/balloon animation to last)
+        });
+
+        // Initial setup when the window loads
+        window.onload = function() {
+            // Generate an initial burst of confetti when the page loads
+            for (let i = 0; i < 50; i++) {
+                createConfetti();
+            }
+            // The initial state of sections (intro visible, surprise/photo hidden) is handled by default HTML classes.
+        };
+    </script>
+</body>
+</html>
